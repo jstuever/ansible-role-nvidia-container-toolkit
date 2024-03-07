@@ -1,0 +1,25 @@
+---
+# https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+- name: Add nvidia-container-runtime repo
+  ansible.builtin.command: "dnf config-manager --add-repo=https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo"
+  args:
+    creates: '/etc/yum.repos.d/nvidia-container-toolkit.repo'
+  register: nvidia_container_toolkit_repo
+  become: yes
+
+- name: Install nvidia-container-toolkit
+  ansible.builtin.dnf:
+    update_cache: "{{ nvidia_container_toolkit_repo is changed }}"
+    name:
+      - nvidia-container-toolkit
+  become: yes
+
+- name: Generate nvidia cdi
+  ansible.builtin.command:
+    cmd: 'nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml'
+    creates: '/etc/cdi/nvidia.yaml'
+  become: yes
+
+- name: Set selinux type container_file_t on /dev/nvidia*
+  ansible.builtin.shell: 'chcon -t container_file_t /dev/nvidia*'
+  become: yes
