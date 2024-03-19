@@ -19,7 +19,3 @@
     cmd: 'nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml'
     creates: '/etc/cdi/nvidia.yaml'
   become: yes
-
-- name: Set selinux type container_file_t on /dev/nvidia*
-  ansible.builtin.shell: 'chcon -t container_file_t /dev/nvidia*'
-  become: yes
